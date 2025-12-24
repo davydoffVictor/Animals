@@ -111,19 +111,23 @@ public class AnimalServiceImplTest {
     public void testUpdateWorksForValidRequest() {
         Long id = 1L;
         Animal animal = setTestAnimalAndRepositoryBehaviour(id, Type.DOG, LocalDate.of(2018, 10, 11), Sex.FEMALE, "Lucky");
-        Animal updateAnimal = new Animal();
-        updateAnimal.setId(animal.getId());
-        updateAnimal.setType(animal.getType());
-        updateAnimal.setBirthDate(animal.getBirthDate());
-        updateAnimal.setSex(animal.getSex());
-        updateAnimal.setName("Charlie");
-        Mockito.when(animalRepository.save(updateAnimal))
-                .thenReturn(updateAnimal);
+        Animal updatedAnimal = new Animal();
+        updatedAnimal.setId(animal.getId());
+        updatedAnimal.setType(animal.getType());
+        updatedAnimal.setBirthDate(animal.getBirthDate());
+        updatedAnimal.setSex(animal.getSex());
+        updatedAnimal.setName("Charlie");
+        Mockito.when(animalRepository.findById(updatedAnimal.getId()))
+                .thenReturn(Optional.of(updatedAnimal));
+        Mockito.when(animalRepository.save(updatedAnimal))
+                .thenReturn(updatedAnimal);
 
-        Animal returnedAnimal = animalService.update(updateAnimal);
 
-        Assertions.assertEquals(updateAnimal, returnedAnimal);
-        Mockito.verify(animalRepository, Mockito.times(1)).save(updateAnimal);
+        Animal returnedAnimal = animalService.update(updatedAnimal);
+
+        Assertions.assertEquals(updatedAnimal, returnedAnimal);
+        Mockito.verify(animalRepository, Mockito.times(1)).findById(updatedAnimal.getId());
+        Mockito.verify(animalRepository, Mockito.times(1)).save(updatedAnimal);
     }
 
     @Test
@@ -177,7 +181,7 @@ public class AnimalServiceImplTest {
 
         Mockito.verify(animalRepository, Mockito.times(1)).save(animalToBeCreated);
         Mockito.verify(animalRepository, Mockito.times(1)).assignAnimal(userIdToBeAssignedToAnimal, animalToBeCreatedFutureId);
-        Assertions.assertEquals(createdAnimal.getId(), animalToBeCreatedFutureId);
+        Assertions.assertEquals(animalToBeCreatedFutureId, createdAnimal.getId());
 
 
     }
@@ -192,7 +196,7 @@ public class AnimalServiceImplTest {
     }
 
     @Test
-    public void testPrivateMethodValidateBirthday() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void testPrivateMethodValidateBirthday() throws NoSuchMethodException {
         Method validateBirthday = AnimalServiceImpl.class.getDeclaredMethod("validateBirthday", LocalDate.class);
         validateBirthday.setAccessible(true);
 

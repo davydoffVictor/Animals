@@ -1,0 +1,35 @@
+version: '3'
+
+volumes:
+  db-data:
+    driver: local
+
+services:
+  app:
+    build:
+      context: .
+    container_name: animals
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:${POSTGRES_PORT}/${DB_NAME}?currentSchema=${DB_SCHEMA}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - JAVA_HOME=/usr/lib/jvm/jre
+    ports:
+      - '8080:8080'
+    env_file:
+      - .env
+
+  db:
+    image: postgres:18.1-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+
+

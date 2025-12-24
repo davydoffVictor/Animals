@@ -5,12 +5,12 @@ import com.example.zoo.domain.user.Role;
 import com.example.zoo.domain.user.User;
 import com.example.zoo.repository.UserRepository;
 import com.example.zoo.service.UserService;
-import io.jsonwebtoken.security.Password;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -87,6 +87,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isAnimalOwner(Long userId, Long animalId) {
         return userRepository.isAnimalOwner(userId, animalId);
+    }
+
+    @Override
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
 

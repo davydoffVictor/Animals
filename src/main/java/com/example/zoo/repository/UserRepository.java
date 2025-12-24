@@ -1,10 +1,12 @@
 package com.example.zoo.repository;
 
 import com.example.zoo.domain.user.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,13 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     @Query(value = """
-	        select u.name
-	            from user
-	            where u.name = :username
-            """, nativeQuery = true)
-    String checkUsername(String username);
-
-    @Query(value = """
              SELECT exists(
                            SELECT 1
                            FROM users_animals
@@ -30,4 +25,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                              AND animal_id = :animalId)
             """, nativeQuery = true)
     boolean isAnimalOwner(Long userId, Long animalId);
+
+
+    @EntityGraph(attributePaths = {"roles"})
+    List<User> findAll();
 }

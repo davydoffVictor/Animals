@@ -74,5 +74,12 @@ public class UserController {
         return userMapper.toDto(updatedUser);
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserDto> getAll() {
+        log.info("getAll Users called");
+        return userMapper.toDto(userService.getAll());
+    }
+
 
 }

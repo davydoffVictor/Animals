@@ -32,7 +32,6 @@ public class UserServiceImplTest {
     @Test
     public void testGetByIdThrowsExceptionForNonExistingId() {
         Long id = 1L;
-        User user = setTestUserAndRepositoryBehaviour(id);
         Long nonExistingId = 2L;
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userService.getById(nonExistingId));
@@ -49,12 +48,14 @@ public class UserServiceImplTest {
         updateUser.setUsername(user.getUsername());
         updateUser.setPassword(user.getPassword());
         updateUser.setName("Maxim Grebenshchikov");
+        Mockito.when(userRepository.findById(updateUser.getId())).thenReturn(Optional.of(updateUser));
         Mockito.when(userRepository.save(updateUser))
                 .thenReturn(updateUser);
 
         User returnedUser = userService.update(updateUser);
 
         Assertions.assertEquals(updateUser, returnedUser);
+        Mockito.verify(userRepository, Mockito.times(1)).findById(updateUser.getId());
         Mockito.verify(userRepository, Mockito.times(1)).save(updateUser);
     }
 
@@ -90,7 +91,7 @@ public class UserServiceImplTest {
         User createdUser = userService.create(userToBeCreated);
 
         Mockito.verify(userRepository, Mockito.times(1)).save(userToBeCreated);
-        Assertions.assertEquals(createdUser.getId(), userToBeCreatedFutureId);
+        Assertions.assertEquals(userToBeCreatedFutureId, createdUser.getId());
     }
 
     @Test
@@ -119,19 +120,20 @@ public class UserServiceImplTest {
 
 
 
-    private User setTestUserAndRepositoryBehaviour(Long id, String name, String username, String password) {
+    private User setTestUserAndRepositoryBehaviour(Long id, String name, String username, String password, String passwordConfirmation) {
         User user = new User();
         user.setId(id);
         user.setName(name);
         user.setUsername(username);
         user.setPassword(password);
+        user.setPasswordConfirmation(passwordConfirmation);
         Mockito.when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
         return user;
     }
 
     private User setTestUserAndRepositoryBehaviour(Long id) {
-        return setTestUserAndRepositoryBehaviour(id, "ILya Ryabov", "iryabov@mail.ru", "123");
+        return setTestUserAndRepositoryBehaviour(id, "ILya Ryabov", "iryabov@mail.ru", "123", "123");
     }
 
 
